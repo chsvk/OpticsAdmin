@@ -20,12 +20,7 @@ Vue.use(BlackDashboard);
 import firebase from 'firebase'
 
 firebase.initializeApp({
-  apiKey: "AIzaSyBSJnZ8feBfxifNkxZP1fbyI8jBnRCqH_0",
-    authDomain: "opticshub-db274.firebaseapp.com",
-    databaseURL: "https://opticshub-db274.firebaseio.com",
-    projectId: "opticshub-db274",
-    storageBucket: "opticshub-db274.appspot.com",
-    messagingSenderId: "584067423916"
+    // ENTER FIREBASE DETAILS
 })
 
 /* eslint-disable no-new */
