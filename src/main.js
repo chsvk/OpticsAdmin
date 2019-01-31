@@ -6,6 +6,9 @@ import BlackDashboard from "./plugins/blackDashboard";
 import i18n from "./i18n"
 import 'vue2-toast/lib/toast.css';
 import Toast from 'vue2-toast';
+import VueAgile from 'vue-agile'
+
+Vue.use(VueAgile)
 Vue.use(Toast, {
     type: 'center',
     duration: 3000,

@@ -23,6 +23,9 @@
     <h3>Enter Description</h3>
     <textarea v-model="product.Description" placeholder="Enter Product Description" name="" id="" cols="90" rows="10"></textarea>
     <h3>DIsplay Images</h3>
+      <div v-if="ButtonText == 'Update Product'" class="ExistingImages">
+        <img v-for="(image, index) in product.DisplayImages" :key="index" :src="image" alt="">
+      </div>
       <div class="newImages cardList">
         <picture-input 
           ref="headOne"
@@ -82,7 +85,7 @@
         </picture-input>
       </div>
       <button @click="UploadHeader">Upload Display Images</button>
-      <button v-if="notUploading" @click="AddProduct"> Add Product </button>
+      <button v-if="notUploading" @click="AddProduct">{{ButtonText}}</button>
   </div>
 </template>
 
@@ -90,6 +93,7 @@
 import PictureInput from 'vue-picture-input'
 import firebase from 'firebase'
 export default {
+  props: ['id'],
   components: {
     PictureInput
   },
@@ -106,10 +110,20 @@ export default {
         SubCategory: null
       },
       DisplaySubCategory: false,
+      ButtonText: 'Add Product'
+    }
+  },
+  mounted(){
+    if(this.$route.params.product.id){
+      this.ButtonText = "Update Product"
+      this.notUploading = true;
+      this.product = this.$route.params.product.data;
+    }else{
+      this.ButtonText = "Add Product"
     }
   },
   methods: {
-    AddProduct(){
+    AddProduct(){var vm = this;
       if(this.product.MainCategory == null){
         alert('Select Category')
       }else{
@@ -118,7 +132,19 @@ export default {
         (this.product.DisplayImages.length != 4)){
           alert('Fields Empty Or Please add 4 Images');
         }else{
-          firebase.firestore().collection('Products').add(this.product);
+          if(vm.ButtonText == 'Update Product'){
+            firebase.firestore().collection('Products').doc(this.$route.params.product.id).update(this.product).then(()=>{
+              vm.$toast(' Product Updated ')
+            })
+          }else{
+            if(vm.product.DisplayImages.length==4){
+            firebase.firestore().collection('Products').add(this.product).then(()=>{
+              vm.$toast(" Product Added ")
+            });
+            }else{
+              alert("Please wait while uploading images or Make sure You added 4 images");
+            }
+          } 
         } 
       }
     },
@@ -142,26 +168,29 @@ export default {
       })
     },
     UploadHeader(){var vm = this;
-      if(this.HeadOne){        
+      if(this.HeadOne){   
+        this.notUploading = false;     
         this.ImageUploader(this.HeadOne, "Products", this.randomImageID(), "Banner_One")
         this.HeadOne = null;
       }
       if(this.HeadTwo){
+        this.notUploading = false;
         this.ImageUploader(this.HeadTwo, "Products", this.randomImageID(), "Banner_Two")
         this.HeadTwo = null;
       }
       if(this.HeadThree){
+        this.notUploading = false;
         this.ImageUploader(this.HeadThree, "Header", this.randomImageID(), "Banner_Three")
         this.HeadThree = null;
       }
       if(this.HeadFour){
+        this.notUploading = false;
         this.ImageUploader(this.HeadFour, "Header", this.randomImageID(), "Banner_Four")
         this.HeadFour = null;
       }
       },
       headOne(image){
       this.HeadOne = this.$refs.headOne.file;
-      console.log(this.HeadOne);
       },
       headTwo(image){
         this.HeadTwo = this.$refs.headTwo.file;
@@ -276,6 +305,15 @@ export default {
       display: grid;
       grid-template-columns: 1fr 1fr 1fr 1fr;
       margin: 0 0 1em 0;
+    }
+    .ExistingImages{
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      margin: 1em;
+      img{
+        height: 250px;
+        width: 300px;
+      }
     }
   }
 </style>
